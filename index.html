@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Lost and Found</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    margin: 0;
+    color: #1e293b;
+}
+
+header {
+    background: #173b65;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+}
+
+main {
+    max-width: 650px;
+    margin: 25px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px #00000010;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+button {
+    background: #173b65;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #285b8e;
+}
+
+.item {
+    background: #eaf1f8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.item h3 {
+    margin-top: 0;
+}
+
+.empty {
+    color: #64748b;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Digital Lost and Found</h1>
+    <p>Find your lost items easily!</p>
+</header>
+
+<main>
+
+    <section class="card">
+        <h2>Report Your Item</h2>
+
+        <form id="itemForm">
+            <input
+                type="text"
+                id="itemName"
+                placeholder="Enter item name"
+                required
+            >
+
+            <select id="itemType">
+                <option value="Lost">Lost Item</option>
+                <option value="Found">Found Item</option>
+            </select>
+
+            <input
+                type="text"
+                id="itemLocation"
+                placeholder="Enter location"
+                required
+            >
+
+            <button type="submit">Submit Report</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Item Reports</h2>
+        <div id="itemList"></div>
+    </section>
+
+</main>
+
+<script>
+const form = document.getElementById("itemForm");
+const itemList = document.getElementById("itemList");
+
+let items = [];
+
+try {
+    items = JSON.parse(
+        localStorage.getItem("items") || "[]"
+    );
+} catch (error) {
+    items = [];
+}
+
+function displayItems() {
+    itemList.replaceChildren();
+
+    if (items.length === 0) {
+        const message = document.createElement("p");
+        message.className = "empty";
+        message.textContent = "No item reports yet.";
+        itemList.appendChild(message);
+        return;
+    }
+
+    items.forEach(function(item) {
+        const card = document.createElement("div");
+        card.className = "item";
+
+        const name = document.createElement("h3");
+        name.textContent = item.name;
+
+        const type = document.createElement("p");
+        type.textContent = "Type: " + item.type;
+
+        const location = document.createElement("p");
+        location.textContent = "Location: " + item.location;
+
+        card.append(name, type, location);
+        itemList.appendChild(card);
+    });
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("itemName").value.trim();
+    const type = document.getElementById("itemType").value;
+    const location = document.getElementById("itemLocation").value.trim();
+
+    if (!name || !location) return;
+
+    items.push({
+        name: name,
+        type: type,
+        location: location
+    });
+
+    localStorage.setItem("items", JSON.stringify(items));
+
+    displayItems();
+    form.reset();
+});
+
+displayItems();
+</script>
+
+</body>
+</html>
